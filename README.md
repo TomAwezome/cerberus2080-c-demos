@@ -1,6 +1,6 @@
 # cerberus2080-c-demos
 
-Demo programs for the CERBERUS 2080™ written in C using Z88DK.
+Demo programs for the [The Byte Attic's CERBERUS 2080™](https://github.com/TheByteAttic/CERBERUS2080) computer written in C using Z88DK.
 
 ## Setup
 
