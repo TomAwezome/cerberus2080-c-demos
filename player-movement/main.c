@@ -27,14 +27,21 @@ int main()
 		*(video_ram + (40 * player_y) + player_x) = player_character;
 
 		do {} while (*mail_flag == 0);
-		if (*mail_box == 0x77) // w
-			player_y--;
-		if (*mail_box == 0x73) // s
-			player_y++;
-		if (*mail_box == 0x61) // a
-			player_x--;
-		if (*mail_box == 0x64) // d
-			player_x++;
+		switch (*mail_box)
+		{
+			case 0x77: // w
+				player_y--;
+				break;
+			case 0x73: // s
+				player_y++;
+				break;
+			case 0x61: // a
+				player_x--;
+				break;
+			case 0x64: // d
+				player_x++;
+				break;
+		}
 		*mail_flag = 0;
 	}
 
