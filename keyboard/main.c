@@ -19,6 +19,17 @@ int main()
 		{
 			*video_ram = *mail_box;
 			*(video_ram + 64) = i++;
+
+			if ((*mail_box >> 4) <= 9)
+				*(video_ram + 128) = 0x30 + (*mail_box >> 4);
+			else
+				*(video_ram + 128) = 0x37 + (*mail_box >> 4);
+
+			if ((*mail_box & 0x0F) <= 9)
+				*(video_ram + 129) = 0x30 + (*mail_box & 0x0F);
+			else
+				*(video_ram + 129) = 0x37 + (*mail_box & 0x0F);
+
 			*mail_flag = 0;
 		}
 	}
