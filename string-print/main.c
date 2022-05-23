@@ -13,8 +13,6 @@ U16 cursor_x = 4;
 U16 cursor_y = 9;
 
 U8 *video_ram = 0xF800;
-U8 *mail_flag = 0x200;
-U8 *mail_box = 0x201;
 
 U0 ScreenPrint(U16 x, U16 y, U8 *str)
 { // Write bytes of str to video ram at position x,y.
