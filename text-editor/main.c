@@ -44,19 +44,19 @@ U8 blink;
 
 U0 GetKey()
 {
-		if (*mail_flag != 0)
-		{
-			last_keycode = *mail_box;
-			*mail_flag = 0;
-			is_keycode_pending = TRUE;
-		}
+	if (*mail_flag != 0)
+	{
+		last_keycode = *mail_box;
+		*mail_flag = 0;
+		is_keycode_pending = TRUE;
+	}
 }
 
 U0 WriteCharToFile(U8 character)
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
-	U8 *remaining_file_len = 0;
+	U8 remaining_file_len = 0;
 	U8 *shifted_text;
 
 	while (c != 0xFF)
@@ -77,7 +77,7 @@ U0 DeleteCharFromFile()
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
-	U8 *remaining_file_len = 0;
+	U8 remaining_file_len = 0;
 	U8 *shifted_text;
 
 	while (c != 0xFF)
@@ -98,39 +98,40 @@ U0 DeleteCharFromFile()
 
 U0 HandleKey()
 {
-		if (!is_keycode_pending)
-			return;
-		if (last_keycode >= 0x20 && last_keycode < 0xF0)
-		{
-			// type that key at cursor in file
-			WriteCharToFile(last_keycode);
+	if (!is_keycode_pending)
+		return;
+	if (last_keycode >= 0x20 && last_keycode < 0xF0)
+	{
+		// type that key at cursor in file
+		WriteCharToFile(last_keycode);
 
-			is_keycode_pending = FALSE;
-			return;
-		}
-		switch (last_keycode)
-		{
-			case 0x17: // Ctrl-W
-				break;
-			case 0x13: // Ctrl-S
-				break;
-			case 0x01: // Ctrl-A
-				if (cursor_raw_index > 0)
-					cursor_raw_index--;
-				break;
-			case 0x04: // Ctrl-D
-				cursor_raw_index++;
-				break;
-
-			case 0x0D: // Enter
-				WriteCharToFile(0x0A);
-				break;
-
-			case 0x05: // Delete
-				DeleteCharFromFile();
-
-		}
 		is_keycode_pending = FALSE;
+		return;
+	}
+	switch (last_keycode)
+	{
+		case 0x17: // Ctrl-W
+			break;
+		case 0x13: // Ctrl-S
+			break;
+		case 0x01: // Ctrl-A
+			if (cursor_raw_index > 0)
+				cursor_raw_index--;
+			break;
+		case 0x04: // Ctrl-D
+			cursor_raw_index++;
+			break;
+
+		case 0x0D: // Enter
+			WriteCharToFile(0x0A);
+			break;
+
+		case 0x05: // Delete
+			DeleteCharFromFile();
+			break;
+
+	}
+	is_keycode_pending = FALSE;
 }
 
 U0 DrawFileToViewArea()
