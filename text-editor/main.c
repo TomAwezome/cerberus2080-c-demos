@@ -1,7 +1,7 @@
 #pragma output CRT_ORG_CODE = 0x0202
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0xFFF
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0x8000 // 32kb heap
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -52,6 +52,50 @@ U0 GetKey()
 		}
 }
 
+U0 WriteCharToFile(U8 character)
+{
+	U16 i = cursor_raw_index;
+	U8 c = file_area[i];
+	U8 *remaining_file_len = 0;
+	U8 *shifted_text;
+
+	while (c != 0xFF)
+	{
+		remaining_file_len++;
+		c = file_area[++i];
+	}
+
+	shifted_text = malloc(remaining_file_len + 1);
+	memcpy(shifted_text, file_area + cursor_raw_index, remaining_file_len + 1);
+	file_area[cursor_raw_index++] = character;
+	memcpy(file_area + cursor_raw_index, shifted_text, remaining_file_len + 1);
+
+	free(shifted_text);
+}
+
+U0 DeleteCharFromFile()
+{
+	U16 i = cursor_raw_index;
+	U8 c = file_area[i];
+	U8 *remaining_file_len = 0;
+	U8 *shifted_text;
+
+	while (c != 0xFF)
+	{
+		remaining_file_len++;
+		c = file_area[++i];
+	}
+	
+	if (remaining_file_len == 0)
+		return;
+
+	shifted_text = malloc(remaining_file_len);
+	memcpy(shifted_text, file_area + cursor_raw_index + 1, remaining_file_len);
+	memcpy(file_area + cursor_raw_index, shifted_text, remaining_file_len);
+
+	free(shifted_text);
+}
+
 U0 HandleKey()
 {
 		if (!is_keycode_pending)
@@ -59,7 +103,7 @@ U0 HandleKey()
 		if (last_keycode >= 0x20 && last_keycode < 0xF0)
 		{
 			// type that key at cursor in file
-			file_area[cursor_raw_index++] = last_keycode;
+			WriteCharToFile(last_keycode);
 
 			is_keycode_pending = FALSE;
 			return;
@@ -79,8 +123,11 @@ U0 HandleKey()
 				break;
 
 			case 0x0D: // Enter
-				file_area[cursor_raw_index++] = 0x0A;
+				WriteCharToFile(0x0A);
 				break;
+
+			case 0x05: // Delete
+				DeleteCharFromFile();
 
 		}
 		is_keycode_pending = FALSE;
@@ -102,7 +149,7 @@ U0 DrawFileToViewArea()
 		if (c == 0x0A) // newline
 		{
 			if (i == cursor_raw_index && blink & 1)
-				view_area[40 * y + x] = 0x0;
+				view_area[40 * y + x] = 0x0; //draw cursor
 			y++;
 			x = 0;
 		}
@@ -110,7 +157,7 @@ U0 DrawFileToViewArea()
 		{
 			view_area[40 * y + x] = c;
 			if (i == cursor_raw_index && blink & 1)
-				view_area[40 * y + x] = 0x0;
+				view_area[40 * y + x] = 0x0; //draw cursor
 			x++;
 			if (x >= 40)
 			{
