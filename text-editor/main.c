@@ -96,6 +96,27 @@ U0 DeleteCharFromFile()
 	free(shifted_text);
 }
 
+U0 MoveCursorRight()
+{
+	cursor_raw_index++;
+}
+
+U0 MoveCursorLeft()
+{
+	if (cursor_raw_index > 0)
+		cursor_raw_index--;
+
+}
+
+U0 BackspaceCharFromFile()
+{
+	if (cursor_raw_index < 1)
+		return;
+	MoveCursorLeft();
+	DeleteCharFromFile();
+}
+
+
 U0 MoveCursorUp()
 {
 	U16 i = cursor_raw_index;
@@ -120,6 +141,7 @@ U0 MoveCursorDown()
 	cursor_raw_index = i;
 }
 
+
 U0 HandleKey()
 {
 	if (!is_keycode_pending)
@@ -141,11 +163,10 @@ U0 HandleKey()
 			MoveCursorDown();
 			break;
 		case 0x01: // Ctrl-A
-			if (cursor_raw_index > 0)
-				cursor_raw_index--;
+			MoveCursorLeft();
 			break;
 		case 0x04: // Ctrl-D
-			cursor_raw_index++;
+			MoveCursorRight();
 			break;
 
 		case 0x0D: // Enter
@@ -155,6 +176,13 @@ U0 HandleKey()
 		case 0x05: // Delete
 			DeleteCharFromFile();
 			break;
+
+		// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
+		case 0x00: // F12
+		case 0x1C: // Ctrl-Backslash
+		case 0x1D: // Ctrl-]
+		case 0x1B: // Ctrl-[
+			BackspaceCharFromFile();
 
 	}
 	is_keycode_pending = FALSE;
