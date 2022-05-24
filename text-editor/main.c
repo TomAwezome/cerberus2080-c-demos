@@ -56,7 +56,7 @@ U0 WriteCharToFile(U8 character)
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
-	U8 remaining_file_len = 0;
+	U16 remaining_file_len = 0;
 	U8 *shifted_text;
 
 	while (c != 0xFF)
@@ -77,7 +77,7 @@ U0 DeleteCharFromFile()
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
-	U8 remaining_file_len = 0;
+	U16 remaining_file_len = 0;
 	U8 *shifted_text;
 
 	while (c != 0xFF)
