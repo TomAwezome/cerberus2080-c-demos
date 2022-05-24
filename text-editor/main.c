@@ -2,11 +2,13 @@
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0x8000 // 32kb heap
+#pragma output CLIB_STDIO_HEAP_SIZE = 512
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "types.h"
 
 U8 *video_ram = 0xF800;
@@ -24,9 +26,7 @@ U16 file_area_size = 0xEFFF - 0xA000;
 	Load files into memory using the BIOS command 'load' to address A000.
 	Example: "load test.txt A000".
 	To save a file, hit ESC to go back to the BIOS, and use the 'save'
-	command.
-	Example: "save A000 EFFF test.txt"
-	TODO: EFFF is the end of User Block 1, not the end location of file
+	command. The editor shows the save command to run on the bottom row.
 
 	The 'file area size' (from A000 to the end of User Block 1) results
 	in a file size max of about 20kb. Files over that will overwrite
@@ -195,9 +195,8 @@ U0 DrawFileToViewArea()
 	U16 x = 0;
 	U16 y = 0;
 
-	memset(view_area, 0x20, 40 * 30); // fill with empty (space) character
 
-	while (c != 0xFF && y < 30)
+	while (c != 0xFF && y < 28)
 	{
 		if (file_area + i > 0xEFFF) // error
 			return;
@@ -226,13 +225,43 @@ U0 DrawFileToViewArea()
 	}	
 }
 
+U0 ViewAreaPrint(U16 x, U16 y, U8 *str)
+{ // Write bytes of str to view area at position x,y.
+	U16 i;
+	U16 l = strlen(str);
+
+	for (i = 0; i < l; i++)
+		view_area[40 * y + x++] = str[i];
+}
+
+U0 DrawStatusLine()
+{
+	U8 str[128];
+	U16 l = file_area;
+	U16 i = 0;
+	U8 c = file_area[i];
+
+	while (c != 0xFF)
+	{
+		l++;
+		c = file_area[++i];
+	}
+
+	sprintf(str, "Save via BIOS:   save A000 %04X filename", l);
+
+	ViewAreaPrint(0, 28, "________________________________________");
+	ViewAreaPrint(0, 29, str);
+}
+
 int main()
 {
 	U16 i;
 	
 	while (TRUE)
 	{
+		memset(view_area, 0x20, 40 * 30); // clear view area with empty (space) character
 		DrawFileToViewArea();
+		DrawStatusLine();
 		memcpy(video_ram, view_area, video_ram_size + 1);
 
 		GetKey();
