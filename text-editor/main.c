@@ -96,6 +96,30 @@ U0 DeleteCharFromFile()
 	free(shifted_text);
 }
 
+U0 MoveCursorUp()
+{
+	U16 i = cursor_raw_index;
+	U16 orig = i;
+	U8 c = file_area[i];
+
+	while (c != 0x0A && i > 0 && orig - i < 40)
+		c = file_area[--i];
+
+	cursor_raw_index = i;
+}
+
+U0 MoveCursorDown()
+{
+	U16 i = cursor_raw_index;
+	U16 orig = i;
+	U8 c = file_area[i];
+
+	while (c != 0x0A && c != 0xFF && i - orig < 40)
+		c = file_area[++i];
+
+	cursor_raw_index = i;
+}
+
 U0 HandleKey()
 {
 	if (!is_keycode_pending)
@@ -111,8 +135,10 @@ U0 HandleKey()
 	switch (last_keycode)
 	{
 		case 0x17: // Ctrl-W
+			MoveCursorUp();
 			break;
 		case 0x13: // Ctrl-S
+			MoveCursorDown();
 			break;
 		case 0x01: // Ctrl-A
 			if (cursor_raw_index > 0)
