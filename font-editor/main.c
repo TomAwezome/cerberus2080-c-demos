@@ -3,22 +3,26 @@
 #pragma output CRT_ENABLE_EIDI = 0x02
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <strings.h>
 #include <stdbool.h>
 #include "types.h"
+
+#define CHARMAP_X 3
 
 U64 *character_ram = 0xF000;
 U16 character_ram_size = 0xF7FF - 0xF000;
 U8 *video_ram = 0xF800;
 U16 video_ram_size = 0xFCAF - 0xF800;
 
-U16 charmap_draw_x = 3;
+U16 charmap_draw_x = CHARMAP_X;
 U16 charmap_draw_y = 6;
-
-//U16 bitmap_draw_x = charmap_draw_x + 18;
-U16 bitmap_draw_x = 3 + 18;
+U16 bitmap_draw_x = CHARMAP_X + 18;
 U16 bitmap_draw_y = 3;
 
 U16 current_char = 0;
+
+U8 current_bitmap_index = 0;
 
 U8 blink;
 
@@ -27,6 +31,16 @@ U8 *mail_box = 0x201;
 
 U8 last_keycode;
 bool is_keycode_pending = FALSE;
+
+
+U0 ScreenPrint(U16 x, U16 y, U8 *str)
+{ // Write bytes of str to video ram at position x,y.
+	U16 i;
+	U16 l = strlen(str);
+
+	for (i = 0; i < l; i++)
+		video_ram[40 * y + x++] = str[i];
+}
 
 U0 DrawCharMap()
 {
@@ -44,6 +58,24 @@ U0 DrawCharMap()
 		{
 			y++;
 			x = charmap_draw_x;
+		}
+	}
+}
+
+U0 DrawCharBitmapFrame()
+{
+	U16 i = 0;
+	U16 x = bitmap_draw_x - 1;
+	U16 y = bitmap_draw_y - 1;
+
+	for (i = 0; i < 100; i++)
+	{
+		video_ram[40 * y + x] = 0x8;
+		x++;
+		if (x > bitmap_draw_x - 1 + 9)
+		{
+			y++;
+			x = bitmap_draw_x - 1;
 		}
 	}
 }
@@ -78,7 +110,8 @@ U0 DrawCurrentChar()
 	{
 		if (current_bits & 0x80)
 			video_ram[40 * y + x] = 0xA0;
-
+		if (i == current_bitmap_index && blink & 1)
+			video_ram[40 * y + x] = 0x0;
 		x++;
 		current_bits = current_bits << 1;
 
@@ -182,10 +215,16 @@ U0 HandleKey()
 
 int main()
 {
+	DrawCharBitmapFrame();
+	ClearCharBitmapArea();
+	ScreenPrint(0, 26, "The quick brown fox");
+	ScreenPrint(0, 27, "jumps over a lazy dog!?  :)");
+
+
 	while (TRUE)
 	{
-		DrawCharMap();
 		DrawCurrentChar();
+		DrawCharMap();
 		GetKey();
 		HandleKey();
 		blink++;
