@@ -1,6 +1,7 @@
 #pragma output CRT_ORG_CODE = 0x0202
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0xFFF
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -161,6 +162,68 @@ U0 MoveCharacterCursorDown()
 	}
 }
 
+U0 MoveBitmapCursorRight()
+{
+	if (current_bitmap_index < 63)
+		current_bitmap_index++;
+}
+
+U0 MoveBitmapCursorLeft()
+{
+	if (current_bitmap_index > 0)
+		current_bitmap_index--;
+}
+
+U0 MoveBitmapCursorUp()
+{
+	U16 c = 0;
+
+	while (current_bitmap_index > 0 && c < 8)
+	{
+		current_bitmap_index--;
+		c++;
+	}
+}
+
+U0 MoveBitmapCursorDown()
+{
+	U16 c = 0;
+
+	while (current_bitmap_index < 63 && c < 8)
+	{
+		current_bitmap_index++;
+		c++;
+	}
+}
+
+U0 DrawBitToCurrentChar()
+{
+	U16 row = current_bitmap_index / 8;
+	U8 *current = character_ram + current_char;
+	U8 current_bits;
+	U16 shift = current_bitmap_index - (row * 8);
+
+	current += row;
+	current_bits = *current;
+	
+	current_bits = current_bits | (1 << (7 - shift));
+
+	*current = current_bits;
+}
+U0 DeleteBitFromCurrentChar()
+{
+	U16 row = current_bitmap_index / 8;
+	U8 *current = character_ram + current_char;
+	U8 current_bits;
+	U16 shift = current_bitmap_index - (row * 8);
+
+	current += row;
+	current_bits = *current;
+	
+	current_bits = current_bits & ~(1 << (7 - shift));
+
+	*current = current_bits;
+}
 U0 GetKey()
 {
 	if (*mail_flag != 0)
@@ -180,26 +243,35 @@ U0 HandleKey()
 
 	switch (last_keycode)
 	{
-		case 0x17: // Ctrl-W
+		case 0x17: // Ctrl-w
 			MoveCharacterCursorUp();
 			break;
-		case 0x13: // Ctrl-S
+		case 0x13: // Ctrl-s
 			MoveCharacterCursorDown();
 			break;
-		case 0x01: // Ctrl-A
+		case 0x01: // Ctrl-a
 			MoveCharacterCursorLeft();
 			break;
-		case 0x04: // Ctrl-D
+		case 0x04: // Ctrl-d
 			MoveCharacterCursorRight();
 			break;
 
-		case 0x20: // Space(?)
-		case 0x0D: // Enter
-//			WriteCharToFile(0x0A);
+		case 0x77: // w
+			MoveBitmapCursorUp();
+			break;
+		case 0x73: // s
+			MoveBitmapCursorDown();
+			break;
+		case 0x61: // a
+			MoveBitmapCursorLeft();
+			break;
+		case 0x64: // d
+			MoveBitmapCursorRight();
 			break;
 
-		case 0x05: // Delete
-//			DeleteCharFromFile();
+		case 0x20: // Space
+		case 0x0D: // Enter
+			DrawBitToCurrentChar();
 			break;
 
 		// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
@@ -207,8 +279,9 @@ U0 HandleKey()
 		case 0x1C: // Ctrl-Backslash
 		case 0x1D: // Ctrl-]
 		case 0x1B: // Ctrl-[
-//			BackspaceCharFromFile();
-
+		case 0x05: // Delete
+			DeleteBitFromCurrentChar();
+		break;
 	}
 	is_keycode_pending = FALSE;
 }
@@ -217,9 +290,10 @@ int main()
 {
 	DrawCharBitmapFrame();
 	ClearCharBitmapArea();
-	ScreenPrint(0, 26, "The quick brown fox");
-	ScreenPrint(0, 27, "jumps over a lazy dog!?  :)");
-
+	ScreenPrint(0, 26, "THE QUICK BROWN FOX");
+	ScreenPrint(0, 27, "JUMPS OVER A LAZY DOG!?");
+	ScreenPrint(0, 28, "the quick brown fox");
+	ScreenPrint(0, 29, "jumps over a lazy dog.  :-)");
 
 	while (TRUE)
 	{
