@@ -69,7 +69,6 @@ U0 ClearCharBitmapArea()
 U0 DrawCurrentChar()
 {
 	U16 i = 0;
-	U8 character = 0x8;
 	U8 *current = character_ram + current_char;
 	U8 current_bits = *current;
 	U16 x = bitmap_draw_x;
@@ -78,7 +77,7 @@ U0 DrawCurrentChar()
 	for (i = 0; i < 64; i++)
 	{
 		if (current_bits & 0x80)
-			video_ram[40 * y + x] = character;
+			video_ram[40 * y + x] = 0xA0;
 
 		x++;
 		current_bits = current_bits << 1;
@@ -95,40 +94,39 @@ U0 DrawCurrentChar()
 	return 0;
 }
 
-U0 MoveCursorRight()
+U0 MoveCharacterCursorRight()
 {
-	current_char++;
+	if (current_char < 255)
+		current_char++;
 }
 
-U0 MoveCursorLeft()
+U0 MoveCharacterCursorLeft()
 {
 	if (current_char > 0)
 		current_char--;
 }
 
-U0 MoveCursorUp()
-{/*
-	U16 i = cursor_raw_index;
-	U16 orig = i;
-	U8 c = file_area[i];
+U0 MoveCharacterCursorUp()
+{
+	U16 c = 0;
 
-	while (c != 0x0A && i > 0 && orig - i < 40)
-		c = file_area[--i];
+	while (current_char > 0 && c < 16)
+	{
+		current_char--;
+		c++;
+	}
+}
 
-	cursor_raw_index = i;
-*/}
+U0 MoveCharacterCursorDown()
+{
+	U16 c = 0;
 
-U0 MoveCursorDown()
-{/*
-	U16 i = cursor_raw_index;
-	U16 orig = i;
-	U8 c = file_area[i];
-
-	while (c != 0x0A && c != 0xFF && i - orig < 40)
-		c = file_area[++i];
-
-	cursor_raw_index = i;
-*/}
+	while (current_char < 255 && c < 16)
+	{
+		current_char++;
+		c++;
+	}
+}
 
 U0 GetKey()
 {
@@ -144,28 +142,22 @@ U0 HandleKey()
 {
 	if (!is_keycode_pending)
 		return;
-	if (last_keycode > 0x20 && last_keycode < 0xF0)
-	{
-		// type that key at cursor in file
-//		WriteCharToFile(last_keycode);
 
-		is_keycode_pending = FALSE;
-		return;
-	}
 	ClearCharBitmapArea();
+
 	switch (last_keycode)
 	{
 		case 0x17: // Ctrl-W
-			MoveCursorUp();
+			MoveCharacterCursorUp();
 			break;
 		case 0x13: // Ctrl-S
-			MoveCursorDown();
+			MoveCharacterCursorDown();
 			break;
 		case 0x01: // Ctrl-A
-			MoveCursorLeft();
+			MoveCharacterCursorLeft();
 			break;
 		case 0x04: // Ctrl-D
-			MoveCursorRight();
+			MoveCharacterCursorRight();
 			break;
 
 		case 0x20: // Space(?)
@@ -201,3 +193,4 @@ int main()
 
 	return 0;
 }
+
