@@ -5,21 +5,19 @@
 #include <stdint.h>
 #include "types.h"
 
-U8 *video_ram = 0xF800;
-U16 video_ram_size = 0xFCAF - 0xF800;
+#define VIDEO_RAM 0xF800
+#define VIDEO_RAM_SIZE (40 * 30)
 
 int main()
 {
-	U16 i = 0;
 	U8 character = 0xFF;
+	U8 *current = VIDEO_RAM;
 
 	while (TRUE)
 	{
-		*(video_ram + i++) = character++;
-		if (i > video_ram_size)
-		{
-			i = 0;
-		}
+		*current++ = character++;
+		if (current >= VIDEO_RAM + VIDEO_RAM_SIZE)
+			current = VIDEO_RAM;
 	}
 
 	return 0;

@@ -11,17 +11,26 @@
 #include <stdio.h>
 #include "types.h"
 
-U8 *video_ram = 0xF800;
-U16 video_ram_size = 0xFCAF - 0xF800;
+#define VIDEO_RAM 0xF800
+#define VIDEO_RAM_SIZE (40 * 30)
+#define VIDEO_RAM_END (VIDEO_RAM + VIDEO_RAM_SIZE - 1)
+#define MAIL_FLAG 0x200
+#define MAIL_BOX 0x201
 
-U8 *mail_flag = 0x200;
-U8 *mail_box = 0x201;
+#define FILE_AREA 0xA000
+#define USERBLOCK1_END 0xEFFF
+
+#define STATUS_LINE_Y 27
+
+const U8 *mail_flag = MAIL_FLAG;
+const U8 *mail_box = MAIL_BOX;
+const U8 *video_ram = VIDEO_RAM;
 
 U8 last_keycode;
 bool is_keycode_pending = FALSE;
 
-U8 *file_area = 0xA000;
-U16 file_area_size = 0xEFFF - 0xA000;
+const U8 *file_area = FILE_AREA;
+const U16 file_area_size = USERBLOCK1_END - FILE_AREA;
 /*
 	Load files into memory using the BIOS command 'load' to address A000.
 	Example: "load test.txt A000".
@@ -38,7 +47,7 @@ U16 file_area_size = 0xEFFF - 0xA000;
 U16 view_cursor_raw_index = 0;
 U16 cursor_raw_index = 0;
 
-U8 view_area[40 * 30];
+const U8 view_area[40 * 30];
 
 U8 blink;
 
@@ -141,49 +150,44 @@ U0 MoveCursorDown()
 	cursor_raw_index = i;
 }
 
-
 U0 HandleKey()
 {
 	if (!is_keycode_pending)
 		return;
 	if (last_keycode >= 0x20 && last_keycode < 0xF0)
+		WriteCharToFile(last_keycode); // type that key at cursor in file
+	else
 	{
-		// type that key at cursor in file
-		WriteCharToFile(last_keycode);
+		switch (last_keycode)
+		{
+			case 0x17: // Ctrl-W
+				MoveCursorUp();
+				break;
+			case 0x13: // Ctrl-S
+				MoveCursorDown();
+				break;
+			case 0x01: // Ctrl-A
+				MoveCursorLeft();
+				break;
+			case 0x04: // Ctrl-D
+				MoveCursorRight();
+				break;
 
-		is_keycode_pending = FALSE;
-		return;
-	}
-	switch (last_keycode)
-	{
-		case 0x17: // Ctrl-W
-			MoveCursorUp();
-			break;
-		case 0x13: // Ctrl-S
-			MoveCursorDown();
-			break;
-		case 0x01: // Ctrl-A
-			MoveCursorLeft();
-			break;
-		case 0x04: // Ctrl-D
-			MoveCursorRight();
-			break;
+			case 0x0D: // Enter
+				WriteCharToFile(0x0A);
+				break;
 
-		case 0x0D: // Enter
-			WriteCharToFile(0x0A);
-			break;
+			case 0x05: // Delete
+				DeleteCharFromFile();
+				break;
 
-		case 0x05: // Delete
-			DeleteCharFromFile();
-			break;
-
-		// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
-		case 0x00: // F12
-		case 0x1C: // Ctrl-Backslash
-		case 0x1D: // Ctrl-]
-		case 0x1B: // Ctrl-[
-			BackspaceCharFromFile();
-
+			// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
+			case 0x00: // F12
+			case 0x1C: // Ctrl-Backslash
+			case 0x1D: // Ctrl-]
+			case 0x1B: // Ctrl-[
+				BackspaceCharFromFile();
+		}
 	}
 	is_keycode_pending = FALSE;
 }
@@ -196,7 +200,7 @@ U0 DrawFileToViewArea()
 	U16 y = 0;
 
 
-	while (c != 0xFF && y < 28)
+	while (c != 0xFF && y < STATUS_LINE_Y)
 	{
 		if (file_area + i > 0xEFFF) // error
 			return;
@@ -249,8 +253,10 @@ U0 DrawStatusLine()
 
 	sprintf(str, "Save via BIOS:   save A000 %04X filename", l);
 
-	ViewAreaPrint(0, 28, "________________________________________");
-	ViewAreaPrint(0, 29, str);
+	ViewAreaPrint(0, STATUS_LINE_Y, "________________________________________");
+	ViewAreaPrint(0, STATUS_LINE_Y + 1, "Load via BIOS:        load filename A000");
+	ViewAreaPrint(0, STATUS_LINE_Y + 2, str);
+
 }
 
 int main()
@@ -259,13 +265,12 @@ int main()
 	
 	while (TRUE)
 	{
-		memset(view_area, 0x20, 40 * 30); // clear view area with empty (space) character
-		DrawFileToViewArea();
-		DrawStatusLine();
-		memcpy(video_ram, view_area, video_ram_size + 1);
-
+		memset(view_area, 0x20, VIDEO_RAM_SIZE); // clear view area with empty (space) character
 		GetKey();
 		HandleKey();
+		DrawFileToViewArea();
+		DrawStatusLine();
+		memcpy(VIDEO_RAM, view_area, VIDEO_RAM_SIZE);
 		blink++;
 	}
 

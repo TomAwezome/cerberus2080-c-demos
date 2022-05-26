@@ -5,32 +5,39 @@
 #include <stdint.h>
 #include "types.h"
 
-U8 *video_ram = 0xF800;
-U8 *mail_flag = 0x200;
-U8 *mail_box = 0x201;
+#define VIDEO_RAM 0xF800
+#define MAIL_FLAG 0x200
+#define MAIL_BOX 0x201
+
+const U8 *mail_flag = MAIL_FLAG;
+const U8 *mail_box = MAIL_BOX;
+const U8 *video_ram = VIDEO_RAM;
 
 int main()
 {
 	U8 i = 0;
+	U8 keycode;
 
 	while (TRUE)
 	{
 		if (*mail_flag != 0)
 		{
-			*video_ram = *mail_box;
+			keycode = *mail_box;
+			*mail_flag = 0;
+
+			*video_ram = keycode;
 			*(video_ram + 64) = i++;
 
-			if ((*mail_box >> 4) <= 9)
-				*(video_ram + 128) = 0x30 + (*mail_box >> 4);
+			if ((keycode >> 4) <= 9)
+				*(video_ram + 128) = 0x30 + (keycode >> 4);
 			else
-				*(video_ram + 128) = 0x37 + (*mail_box >> 4);
+				*(video_ram + 128) = 0x37 + (keycode >> 4);
 
-			if ((*mail_box & 0x0F) <= 9)
-				*(video_ram + 129) = 0x30 + (*mail_box & 0x0F);
+			if ((keycode & 0x0F) <= 9)
+				*(video_ram + 129) = 0x30 + (keycode & 0x0F);
 			else
-				*(video_ram + 129) = 0x37 + (*mail_box & 0x0F);
+				*(video_ram + 129) = 0x37 + (keycode & 0x0F);
 
-			*mail_flag = 0;
 		}
 	}
 

@@ -9,6 +9,11 @@
 #include <stdbool.h>
 #include "types.h"
 
+#define VIDEO_RAM 0xF800
+#define CHARACTER_RAM 0xF000
+#define MAIL_FLAG 0x200
+#define MAIL_BOX 0x201
+
 #define CHARMAP_X 0
 #define CHARMAP_Y 0
 
@@ -18,19 +23,17 @@
 #define BITMAP_X BITMAP_FRAME_X + 1
 #define BITMAP_Y BITMAP_FRAME_Y + 1
 
-U64 *character_ram = 0xF000;
-U16 character_ram_size = 0xF7FF - 0xF000;
-U8 *video_ram = 0xF800;
-U16 video_ram_size = 0xFCAF - 0xF800;
+const U8 *mail_flag = MAIL_FLAG;
+const U8 *mail_box = MAIL_BOX;
+const U8 *video_ram = VIDEO_RAM;
+
+const U64 *character_ram = CHARACTER_RAM;
 
 U16 current_char = 0;
 
 U8 current_bitmap_index = 0;
 
 U8 blink;
-
-U8 *mail_flag = 0x200;
-U8 *mail_box = 0x201;
 
 U8 last_keycode;
 bool is_keycode_pending = FALSE;

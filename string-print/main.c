@@ -8,11 +8,13 @@
 #include <strings.h>
 #include "types.h"
 
-U8 test_string[] = "Test print string to video ram. text starts at a given x,y and wraps due to simple positioning logic";
+#define VIDEO_RAM 0xF800
+
+const U8 *video_ram = VIDEO_RAM;
+
+const U8 test_string[] = "Test print string to video ram. text starts at a given x,y and wraps due to simple positioning logic";
 U16 cursor_x = 4;
 U16 cursor_y = 9;
-
-U8 *video_ram = 0xF800;
 
 U0 ScreenPrint(U16 x, U16 y, U8 *str)
 { // Write bytes of str to video ram at position x,y.
@@ -20,7 +22,7 @@ U0 ScreenPrint(U16 x, U16 y, U8 *str)
 	U16 l = strlen(str);
 
 	for (i = 0; i < l; i++)
-		*(video_ram + (40 * y) + x++) = str[i];
+		video_ram[40 * y + x++] = str[i];
 }
 
 int main()

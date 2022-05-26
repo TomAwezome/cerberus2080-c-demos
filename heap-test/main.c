@@ -8,23 +8,23 @@
 #include <strings.h>
 #include "types.h"
 
-U8 *video_ram = 0xF800;
-U16 video_ram_size = 0xFCAF - 0xF800;
+#define VIDEO_RAM 0xF800
+#define VIDEO_RAM_SIZE (40 * 30)
 
 int main()
 {
-	U8 *t = malloc(video_ram_size + 1);
+	U8 *t = malloc(VIDEO_RAM_SIZE);
 	U8 *d;
 	U16 i;
 
 	while (TRUE)
 	{
-		for (i = 0; i <= video_ram_size; i++)
+		for (i = 0; i < VIDEO_RAM_SIZE; i++)
 			t[i] = rand();
 
-		memcpy(video_ram, t, video_ram_size + 1);
+		memcpy(VIDEO_RAM, t, VIDEO_RAM_SIZE);
 
-		d = malloc(video_ram_size + 1);
+		d = malloc(VIDEO_RAM_SIZE);
 		free(t);
 		t = d;
 	}
