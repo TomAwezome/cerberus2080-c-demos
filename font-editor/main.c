@@ -9,17 +9,16 @@
 #include <stdbool.h>
 #include "types.h"
 
-#define CHARMAP_X 3
+#define CHARMAP_X 0
+#define CHARMAP_Y 0
+
+#define BITMAP_X CHARMAP_X + 18
+#define BITMAP_Y 1
 
 U64 *character_ram = 0xF000;
 U16 character_ram_size = 0xF7FF - 0xF000;
 U8 *video_ram = 0xF800;
 U16 video_ram_size = 0xFCAF - 0xF800;
-
-U16 charmap_draw_x = CHARMAP_X;
-U16 charmap_draw_y = 6;
-U16 bitmap_draw_x = CHARMAP_X + 18;
-U16 bitmap_draw_y = 3;
 
 U16 current_char = 0;
 
@@ -46,8 +45,8 @@ U0 ScreenPrint(U16 x, U16 y, U8 *str)
 U0 DrawCharMap()
 {
 	U16 i;
-	U16 x = charmap_draw_x;
-	U16 y = charmap_draw_y;
+	U16 x = CHARMAP_X;
+	U16 y = CHARMAP_Y;
 
 	for (i = 0; i < 256; i++)
 	{
@@ -55,10 +54,10 @@ U0 DrawCharMap()
 		if (current_char == i && blink & 1)
 			video_ram[40 * y + x] = 0x0;
 		x++;
-		if (x >= charmap_draw_x + 16)
+		if (x >= CHARMAP_X + 16)
 		{
 			y++;
-			x = charmap_draw_x;
+			x = CHARMAP_X;
 		}
 	}
 }
@@ -66,17 +65,17 @@ U0 DrawCharMap()
 U0 DrawCharBitmapFrame()
 {
 	U16 i = 0;
-	U16 x = bitmap_draw_x - 1;
-	U16 y = bitmap_draw_y - 1;
+	U16 x = BITMAP_X - 1;
+	U16 y = BITMAP_Y - 1;
 
 	for (i = 0; i < 100; i++)
 	{
 		video_ram[40 * y + x] = 0x8;
 		x++;
-		if (x > bitmap_draw_x - 1 + 9)
+		if (x > BITMAP_X - 1 + 9)
 		{
 			y++;
-			x = bitmap_draw_x - 1;
+			x = BITMAP_X - 1;
 		}
 	}
 }
@@ -84,17 +83,17 @@ U0 DrawCharBitmapFrame()
 U0 ClearCharBitmapArea()
 {
 	U16 i = 0;
-	U16 x = bitmap_draw_x;
-	U16 y = bitmap_draw_y;
+	U16 x = BITMAP_X;
+	U16 y = BITMAP_Y;
 
 	for (i = 0; i < 64; i++)
 	{
 		video_ram[40 * y + x] = 0x20; // empty character
 		x++;
-		if (x > bitmap_draw_x + 7)
+		if (x > BITMAP_X + 7)
 		{
 			y++;
-			x = bitmap_draw_x;
+			x = BITMAP_X;
 		}
 	}
 }
@@ -104,8 +103,8 @@ U0 DrawCurrentChar()
 	U16 i = 0;
 	U8 *current = character_ram + current_char;
 	U8 current_bits = *current;
-	U16 x = bitmap_draw_x;
-	U16 y = bitmap_draw_y;
+	U16 x = BITMAP_X;
+	U16 y = BITMAP_Y;
 
 	for (i = 0; i < 64; i++)
 	{
@@ -116,12 +115,12 @@ U0 DrawCurrentChar()
 		x++;
 		current_bits = current_bits << 1;
 
-		if (x > bitmap_draw_x + 7)
+		if (x > BITMAP_X + 7)
 		{
 			current++;
 			current_bits = *current;
 			y++;
-			x = bitmap_draw_x;
+			x = BITMAP_X;
 		}
 	}
 
@@ -306,4 +305,3 @@ int main()
 
 	return 0;
 }
-
