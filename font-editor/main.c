@@ -15,6 +15,9 @@
 #define BITMAP_X CHARMAP_X + 18
 #define BITMAP_Y 1
 
+#define BITMAP_FRAME_X BITMAP_X - 1
+#define BITMAP_FRAME_Y BITMAP_Y - 1
+
 U64 *character_ram = 0xF000;
 U16 character_ram_size = 0xF7FF - 0xF000;
 U8 *video_ram = 0xF800;
@@ -65,17 +68,17 @@ U0 DrawCharMap()
 U0 DrawCharBitmapFrame()
 {
 	U16 i = 0;
-	U16 x = BITMAP_X - 1;
-	U16 y = BITMAP_Y - 1;
+	U16 x = BITMAP_FRAME_X;
+	U16 y = BITMAP_FRAME_Y;
 
 	for (i = 0; i < 100; i++)
 	{
 		video_ram[40 * y + x] = 0x8;
 		x++;
-		if (x > BITMAP_X - 1 + 9)
+		if (x > BITMAP_FRAME_X + 9)
 		{
 			y++;
-			x = BITMAP_X - 1;
+			x = BITMAP_FRAME_X;
 		}
 	}
 }
