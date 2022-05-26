@@ -292,6 +292,11 @@ int main()
 {
 	DrawCharBitmapFrame();
 	ClearCharBitmapArea();
+
+	ScreenPrint(0, 22, "DELETE/F12 to erase.");
+	ScreenPrint(0, 23, "SPACE/ENTER to draw.");
+	ScreenPrint(0, 24, "WASD to move bitmap cursor.");
+	ScreenPrint(0, 25, "CTRL-WASD to move charmap cursor.");
 	ScreenPrint(0, 26, "THE QUICK BROWN FOX");
 	ScreenPrint(0, 27, "JUMPS OVER A LAZY DOG!?");
 	ScreenPrint(0, 28, "the quick brown fox");
