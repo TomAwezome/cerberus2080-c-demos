@@ -2,16 +2,7 @@
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
 
-#include <stdint.h>
-#include "types.h"
-
-#define VIDEO_RAM 0xF800
-#define MAIL_FLAG 0x200
-#define MAIL_BOX 0x201
-
-const U8 *mail_flag = MAIL_FLAG;
-const U8 *mail_box = MAIL_BOX;
-const U8 *video_ram = VIDEO_RAM;
+#include "cerberus.h"
 
 int main()
 {

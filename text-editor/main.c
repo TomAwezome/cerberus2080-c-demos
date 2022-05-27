@@ -4,27 +4,16 @@
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0x8000 // 32kb heap
 #pragma output CLIB_STDIO_HEAP_SIZE = 512
 
-#include <stdint.h>
+#include "cerberus.h"
 #include <stdlib.h>
 #include <strings.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "types.h"
-
-#define VIDEO_RAM 0xF800
-#define VIDEO_RAM_SIZE (40 * 30)
-#define VIDEO_RAM_END (VIDEO_RAM + VIDEO_RAM_SIZE - 1)
-#define MAIL_FLAG 0x200
-#define MAIL_BOX 0x201
 
 #define FILE_AREA 0xA000
 #define USERBLOCK1_END 0xEFFF
 
 #define STATUS_LINE_Y 27
-
-const U8 *mail_flag = MAIL_FLAG;
-const U8 *mail_box = MAIL_BOX;
-const U8 *video_ram = VIDEO_RAM;
 
 U8 last_keycode;
 bool is_keycode_pending = FALSE;

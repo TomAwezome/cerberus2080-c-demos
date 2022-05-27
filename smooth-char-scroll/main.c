@@ -2,15 +2,7 @@
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
 
-#include <stdint.h>
-#include "types.h"
-
-#define VIDEO_RAM 0xF800
-#define VIDEO_RAM_SIZE (40 * 30)
-#define VIDEO_RAM_END (VIDEO_RAM + VIDEO_RAM_SIZE - 1)
-#define CHARACTER_RAM 0xF000
-#define CHARACTER_RAM_SIZE (8 * 256)
-#define CHARACTER_RAM_END (CHARACTER_RAM + CHARACTER_RAM_SIZE - 1)
+#include "cerberus.h"
 
 int main()
 {

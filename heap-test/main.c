@@ -3,13 +3,9 @@
 #pragma output CRT_ENABLE_EIDI = 0x02
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0xFFF
 
-#include <stdint.h>
+#include "cerberus.h"
 #include <stdlib.h>
 #include <strings.h>
-#include "types.h"
-
-#define VIDEO_RAM 0xF800
-#define VIDEO_RAM_SIZE (40 * 30)
 
 int main()
 {

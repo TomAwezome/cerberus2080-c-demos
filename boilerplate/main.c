@@ -2,7 +2,7 @@
 #pragma output CRT_ENABLE_NMI = 1
 #pragma output CRT_ENABLE_EIDI = 0x02
 
-#include <stdint.h>
+#include "cerberus.h"
 
 int main()
 {

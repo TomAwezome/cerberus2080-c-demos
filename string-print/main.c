@@ -3,14 +3,9 @@
 #pragma output CRT_ENABLE_EIDI = 0x02
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0xFFF
 
-#include <stdint.h>
+#include "cerberus.h"
 #include <stdlib.h>
 #include <strings.h>
-#include "types.h"
-
-#define VIDEO_RAM 0xF800
-
-const U8 *video_ram = VIDEO_RAM;
 
 const U8 test_string[] = "Test print string to video ram. text starts at a given x,y and wraps due to simple positioning logic";
 U16 cursor_x = 4;
