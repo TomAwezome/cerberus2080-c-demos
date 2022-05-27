@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define CHARMAP_X 0
 #define CHARMAP_Y 0
@@ -16,6 +17,9 @@
 
 #define BITMAP_X (BITMAP_FRAME_X + 1)
 #define BITMAP_Y (BITMAP_FRAME_Y + 1)
+
+#define HEXCODE_X 0
+#define HEXCODE_Y 19
 
 U16 current_char = 0;
 
@@ -119,6 +123,28 @@ U0 CurrentCharDraw()
 	}
 
 	return 0;
+}
+
+U0 CharHexAreaClear()
+{
+	ScreenPrint(HEXCODE_X, HEXCODE_Y, "                       ");
+}
+
+U0 CurrentCharHexDraw()
+{
+	U8 str[128];
+	U8 i = 0;
+	U8 *current = character_ram + current_char;
+	U8 current_bits = *current;
+
+	while (i < 8)
+	{
+		sprintf(str, "%02X", current_bits);
+		ScreenPrint(HEXCODE_X + i * 3, HEXCODE_Y, str);
+		current++;
+		current_bits = *current;
+		i++;
+	}
 }
 
 U0 CharacterCursorMoveRight()
@@ -233,6 +259,7 @@ U0 KeyHandle()
 		return;
 
 	CharBitmapAreaClear();
+	CharHexAreaClear();
 
 	switch (last_keycode)
 	{
@@ -297,6 +324,7 @@ int main()
 	{
 		CurrentCharDraw();
 		CharMapDraw();
+		CurrentCharHexDraw();
 		KeyGet();
 		KeyHandle();
 		blink++;
