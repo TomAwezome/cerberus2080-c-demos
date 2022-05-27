@@ -11,7 +11,6 @@
 #include <stdio.h>
 
 #define FILE_AREA 0xA000
-#define USERBLOCK1_END 0xEFFF
 
 #define STATUS_LINE_Y 27
 

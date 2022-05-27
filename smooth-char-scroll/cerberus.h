@@ -38,6 +38,12 @@
 #define VIDEO_RAM 0xF800
 #define VIDEO_RAM_SIZE (40 * 30)
 #define VIDEO_RAM_END (VIDEO_RAM + VIDEO_RAM_SIZE - 1)
+#define USERBLOCK1 0x202
+#define USERBLOCK1_END 0xEFFF
+#define USERBLOCK1_SIZE (USERBLOCK1_END - USERBLOCK1 + 1)
+#define USERBLOCK2 0xFCB1
+#define USERBLOCK2_END (0xFFFF - 512) // z88dk takes 512 topmost bytes for stack
+#define USERBLOCK2_SIZE (USERBLOCK2_END - USERBLOCK2 + 1)
 
 const U8 *video_ram = VIDEO_RAM;
 const U8 *mail_flag = MAIL_FLAG;
