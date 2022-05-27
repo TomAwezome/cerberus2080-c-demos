@@ -5,7 +5,7 @@
 
 #include "cerberus.h"
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include <stdbool.h>
 
 #define CHARMAP_X 0
