@@ -11,11 +11,11 @@
 #define CHARMAP_X 0
 #define CHARMAP_Y 0
 
-#define BITMAP_FRAME_X CHARMAP_X + 16 + 1
+#define BITMAP_FRAME_X (CHARMAP_X + 16 + 1)
 #define BITMAP_FRAME_Y 0
 
-#define BITMAP_X BITMAP_FRAME_X + 1
-#define BITMAP_Y BITMAP_FRAME_Y + 1
+#define BITMAP_X (BITMAP_FRAME_X + 1)
+#define BITMAP_Y (BITMAP_FRAME_Y + 1)
 
 U16 current_char = 0;
 
