@@ -39,7 +39,7 @@ const U8 view_area[40 * 30];
 
 U8 blink;
 
-U0 GetKey()
+U0 KeyGet()
 {
 	if (*mail_flag != 0)
 	{
@@ -49,7 +49,7 @@ U0 GetKey()
 	}
 }
 
-U0 WriteCharToFile(U8 character)
+U0 FileCharWrite(U8 character)
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
@@ -70,7 +70,7 @@ U0 WriteCharToFile(U8 character)
 	free(shifted_text);
 }
 
-U0 DeleteCharFromFile()
+U0 FileCharDelete()
 {
 	U16 i = cursor_raw_index;
 	U8 c = file_area[i];
@@ -93,28 +93,28 @@ U0 DeleteCharFromFile()
 	free(shifted_text);
 }
 
-U0 MoveCursorRight()
+U0 CursorMoveRight()
 {
 	cursor_raw_index++;
 }
 
-U0 MoveCursorLeft()
+U0 CursorMoveLeft()
 {
 	if (cursor_raw_index > 0)
 		cursor_raw_index--;
 
 }
 
-U0 BackspaceCharFromFile()
+U0 FileCharBackspace()
 {
 	if (cursor_raw_index < 1)
 		return;
-	MoveCursorLeft();
-	DeleteCharFromFile();
+	CursorMoveLeft();
+	FileCharDelete();
 }
 
 
-U0 MoveCursorUp()
+U0 CursorMoveUp()
 {
 	U16 i = cursor_raw_index;
 	U16 orig = i;
@@ -126,7 +126,7 @@ U0 MoveCursorUp()
 	cursor_raw_index = i;
 }
 
-U0 MoveCursorDown()
+U0 CursorMoveDown()
 {
 	U16 i = cursor_raw_index;
 	U16 orig = i;
@@ -138,35 +138,35 @@ U0 MoveCursorDown()
 	cursor_raw_index = i;
 }
 
-U0 HandleKey()
+U0 KeyHandle()
 {
 	if (!is_keycode_pending)
 		return;
 	if (last_keycode >= 0x20 && last_keycode < 0xF0)
-		WriteCharToFile(last_keycode); // type that key at cursor in file
+		FileCharWrite(last_keycode); // type that key at cursor in file
 	else
 	{
 		switch (last_keycode)
 		{
 			case 0x17: // Ctrl-W
-				MoveCursorUp();
+				CursorMoveUp();
 				break;
 			case 0x13: // Ctrl-S
-				MoveCursorDown();
+				CursorMoveDown();
 				break;
 			case 0x01: // Ctrl-A
-				MoveCursorLeft();
+				CursorMoveLeft();
 				break;
 			case 0x04: // Ctrl-D
-				MoveCursorRight();
+				CursorMoveRight();
 				break;
 
 			case 0x0D: // Enter
-				WriteCharToFile(0x0A);
+				FileCharWrite(0x0A);
 				break;
 
 			case 0x05: // Delete
-				DeleteCharFromFile();
+				FileCharDelete();
 				break;
 
 			// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
@@ -174,13 +174,13 @@ U0 HandleKey()
 			case 0x1C: // Ctrl-Backslash
 			case 0x1D: // Ctrl-]
 			case 0x1B: // Ctrl-[
-				BackspaceCharFromFile();
+				FileCharBackspace();
 		}
 	}
 	is_keycode_pending = FALSE;
 }
 
-U0 DrawFileToViewArea()
+U0 ViewAreaFileDraw()
 {
 	U16 i = view_cursor_raw_index;
 	U8 c = file_area[i];
@@ -226,7 +226,7 @@ U0 ViewAreaPrint(U16 x, U16 y, U8 *str)
 		view_area[40 * y + x++] = str[i];
 }
 
-U0 DrawStatusLine()
+U0 StatusLineDraw()
 {
 	U8 str[128];
 	U16 l = file_area;
@@ -254,10 +254,10 @@ int main()
 	while (TRUE)
 	{
 		memset(view_area, 0x20, VIDEO_RAM_SIZE); // clear view area with empty (space) character
-		GetKey();
-		HandleKey();
-		DrawFileToViewArea();
-		DrawStatusLine();
+		KeyGet();
+		KeyHandle();
+		ViewAreaFileDraw();
+		StatusLineDraw();
 		memcpy(VIDEO_RAM, view_area, VIDEO_RAM_SIZE);
 		blink++;
 	}

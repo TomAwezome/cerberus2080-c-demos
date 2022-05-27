@@ -36,7 +36,7 @@ U0 ScreenPrint(U16 x, U16 y, U8 *str)
 		video_ram[40 * y + x++] = str[i];
 }
 
-U0 DrawCharMap()
+U0 CharMapDraw()
 {
 	U16 i;
 	U16 x = CHARMAP_X;
@@ -56,7 +56,7 @@ U0 DrawCharMap()
 	}
 }
 
-U0 DrawCharBitmapFrame()
+U0 CharBitmapFrameDraw()
 {
 	U16 i = 0;
 	U16 x = BITMAP_FRAME_X;
@@ -74,7 +74,7 @@ U0 DrawCharBitmapFrame()
 	}
 }
 
-U0 ClearCharBitmapArea()
+U0 CharBitmapAreaClear()
 {
 	U16 i = 0;
 	U16 x = BITMAP_X;
@@ -92,7 +92,7 @@ U0 ClearCharBitmapArea()
 	}
 }
 
-U0 DrawCurrentChar()
+U0 CurrentCharDraw()
 {
 	U16 i = 0;
 	U8 *current = character_ram + current_char;
@@ -121,19 +121,19 @@ U0 DrawCurrentChar()
 	return 0;
 }
 
-U0 MoveCharacterCursorRight()
+U0 CharacterCursorMoveRight()
 {
 	if (current_char < 255)
 		current_char++;
 }
 
-U0 MoveCharacterCursorLeft()
+U0 CharacterCursorMoveLeft()
 {
 	if (current_char > 0)
 		current_char--;
 }
 
-U0 MoveCharacterCursorUp()
+U0 CharacterCursorMoveUp()
 {
 	U16 c = 0;
 
@@ -144,7 +144,7 @@ U0 MoveCharacterCursorUp()
 	}
 }
 
-U0 MoveCharacterCursorDown()
+U0 CharacterCursorMoveDown()
 {
 	U16 c = 0;
 
@@ -155,19 +155,19 @@ U0 MoveCharacterCursorDown()
 	}
 }
 
-U0 MoveBitmapCursorRight()
+U0 BitmapCursorMoveRight()
 {
 	if (current_bitmap_index < 63)
 		current_bitmap_index++;
 }
 
-U0 MoveBitmapCursorLeft()
+U0 BitmapCursorMoveLeft()
 {
 	if (current_bitmap_index > 0)
 		current_bitmap_index--;
 }
 
-U0 MoveBitmapCursorUp()
+U0 BitmapCursorMoveUp()
 {
 	U16 c = 0;
 
@@ -178,7 +178,7 @@ U0 MoveBitmapCursorUp()
 	}
 }
 
-U0 MoveBitmapCursorDown()
+U0 BitmapCursorMoveDown()
 {
 	U16 c = 0;
 
@@ -189,7 +189,7 @@ U0 MoveBitmapCursorDown()
 	}
 }
 
-U0 DrawBitToCurrentChar()
+U0 CurrentCharBitDraw()
 {
 	U16 row = current_bitmap_index / 8;
 	U8 *current = character_ram + current_char;
@@ -203,7 +203,7 @@ U0 DrawBitToCurrentChar()
 
 	*current = current_bits;
 }
-U0 DeleteBitFromCurrentChar()
+U0 CurrentCharBitDelete()
 {
 	U16 row = current_bitmap_index / 8;
 	U8 *current = character_ram + current_char;
@@ -217,7 +217,7 @@ U0 DeleteBitFromCurrentChar()
 
 	*current = current_bits;
 }
-U0 GetKey()
+U0 KeyGet()
 {
 	if (*mail_flag != 0)
 	{
@@ -227,44 +227,44 @@ U0 GetKey()
 	}
 }
 
-U0 HandleKey()
+U0 KeyHandle()
 {
 	if (!is_keycode_pending)
 		return;
 
-	ClearCharBitmapArea();
+	CharBitmapAreaClear();
 
 	switch (last_keycode)
 	{
 		case 0x17: // Ctrl-w
-			MoveCharacterCursorUp();
+			CharacterCursorMoveUp();
 			break;
 		case 0x13: // Ctrl-s
-			MoveCharacterCursorDown();
+			CharacterCursorMoveDown();
 			break;
 		case 0x01: // Ctrl-a
-			MoveCharacterCursorLeft();
+			CharacterCursorMoveLeft();
 			break;
 		case 0x04: // Ctrl-d
-			MoveCharacterCursorRight();
+			CharacterCursorMoveRight();
 			break;
 
 		case 0x77: // w
-			MoveBitmapCursorUp();
+			BitmapCursorMoveUp();
 			break;
 		case 0x73: // s
-			MoveBitmapCursorDown();
+			BitmapCursorMoveDown();
 			break;
 		case 0x61: // a
-			MoveBitmapCursorLeft();
+			BitmapCursorMoveLeft();
 			break;
 		case 0x64: // d
-			MoveBitmapCursorRight();
+			BitmapCursorMoveRight();
 			break;
 
 		case 0x20: // Space
 		case 0x0D: // Enter
-			DrawBitToCurrentChar();
+			CurrentCharBitDraw();
 			break;
 
 		// Backspace key doesn't send to Mail Flag/Box... Use a key nearby :^)
@@ -273,7 +273,7 @@ U0 HandleKey()
 		case 0x1D: // Ctrl-]
 		case 0x1B: // Ctrl-[
 		case 0x05: // Delete
-			DeleteBitFromCurrentChar();
+			CurrentCharBitDelete();
 		break;
 	}
 	is_keycode_pending = FALSE;
@@ -281,8 +281,8 @@ U0 HandleKey()
 
 int main()
 {
-	DrawCharBitmapFrame();
-	ClearCharBitmapArea();
+	CharBitmapFrameDraw();
+	CharBitmapAreaClear();
 
 	ScreenPrint(0, 22, "DELETE/F12 to erase.");
 	ScreenPrint(0, 23, "SPACE/ENTER to draw.");
@@ -295,10 +295,10 @@ int main()
 
 	while (TRUE)
 	{
-		DrawCurrentChar();
-		DrawCharMap();
-		GetKey();
-		HandleKey();
+		CurrentCharDraw();
+		CharMapDraw();
+		KeyGet();
+		KeyHandle();
 		blink++;
 	}
 
