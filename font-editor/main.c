@@ -21,6 +21,9 @@
 #define HEXCODE_X 0
 #define HEXCODE_Y 19
 
+#define INDEX_PRINT_X (CHARMAP_X + 16 + 1)
+#define INDEX_PRINT_Y (BITMAP_Y + 10 + 1)
+
 U16 current_char = 0;
 
 U8 current_bitmap_index = 0;
@@ -145,6 +148,14 @@ U0 CurrentCharHexDraw()
 		current_bits = *current;
 		i++;
 	}
+}
+
+U0 CurrentCharIndexDraw()
+{
+	U8 str[128];
+
+	sprintf(str, "Index: %03d", current_char);
+	ScreenPrint(INDEX_PRINT_X, INDEX_PRINT_Y, str);
 }
 
 U0 CharacterCursorMoveRight()
@@ -323,8 +334,9 @@ int main()
 	while (TRUE)
 	{
 		CurrentCharDraw();
-		CharMapDraw();
 		CurrentCharHexDraw();
+		CurrentCharIndexDraw();
+		CharMapDraw();
 		KeyGet();
 		KeyHandle();
 		blink++;
