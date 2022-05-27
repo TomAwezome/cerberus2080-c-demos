@@ -35,7 +35,7 @@ const U16 file_area_size = USERBLOCK1_END - FILE_AREA;
 U16 view_cursor_raw_index = 0;
 U16 cursor_raw_index = 0;
 
-const U8 view_area[40 * 30];
+const U8 view_area[VIDEO_RAM_SIZE];
 
 U8 blink;
 
