@@ -12,7 +12,7 @@ int main()
 	while (TRUE)
 	{
 		*current++ = character++;
-		if (current >= VIDEO_RAM + VIDEO_RAM_SIZE)
+		if (current > VIDEO_RAM_END)
 			current = VIDEO_RAM;
 	}
 
