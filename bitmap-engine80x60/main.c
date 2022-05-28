@@ -147,14 +147,14 @@ U0 ScreenBitmapPixelDraw(U16 x, U16 y)
 	}
 }
 
-U16 MaxU16(U8 a, U8 b)
+U16 MaxU16(U16 a, U16 b)
 {
 	if (a > b)
 		return a;
 	else
 		return b;
 }
-U16 MinU16(U8 a, U8 b)
+U16 MinU16(U16 a, U16 b)
 {
 	if (a < b)
 		return a;
