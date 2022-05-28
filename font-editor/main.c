@@ -63,7 +63,7 @@ U0 CharMapDraw()
 	}
 }
 
-U0 CharBitmapFrameDraw()
+U0 CharBitmapBorderDraw()
 {
 	U16 i = 0;
 	U16 x = BITMAP_FRAME_X;
@@ -319,7 +319,7 @@ U0 KeyHandle()
 
 int main()
 {
-	CharBitmapFrameDraw();
+	CharBitmapBorderDraw();
 	CharBitmapAreaClear();
 
 	ScreenPrint(0, 22, "DELETE/F12 to erase.");
