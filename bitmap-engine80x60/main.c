@@ -7,7 +7,7 @@
 
 const U8 bitmap_area[VIDEO_RAM_SIZE];
 
-U0 ScreenBitmapDraw(U16 x, U16 y)
+U0 ScreenBitmapPixelDraw(U16 x, U16 y)
 {
 	U16 cell_x = x / 2;
 	U16 cell_y = y / 2;
@@ -147,24 +147,73 @@ U0 ScreenBitmapDraw(U16 x, U16 y)
 	}
 }
 
+U16 MaxU16(U8 a, U8 b)
+{
+	if (a > b)
+		return a;
+	else
+		return b;
+}
+U16 MinU16(U8 a, U8 b)
+{
+	if (a < b)
+		return a;
+	else
+		return b;
+}
+
+U0 ScreenBitmapLineDraw(U16 x1, U16 y1, U16 x2, U16 y2)
+{
+	U16 x_start = MinU16(x1, x2);
+	U16 x_end = MaxU16(x1, x2);
+	U16 y_start = MinU16(y1, y2);
+	U16 y_end = MaxU16(y1, y2);
+	I16 dx = x_end - x_start;
+	I16 dy = y_end - y_start;
+	I16 p = 2 * dy - dx;
+	U16 x = x_start;
+	U16 y = y_start;
+	
+	while (x < x_end)
+	{
+		if (p >= 0)
+		{
+			ScreenBitmapPixelDraw(x, y);
+			y++;
+			p = p + 2 * dy - 2 * dx;
+		}
+		else
+		{
+			ScreenBitmapPixelDraw(x, y);
+			p = p + 2 * dy;
+		}
+		x++;
+	}
+}
+
+U16 cur_x = 10;
+U16 cur_y = 11;
+
+U0 ScreenBitmapFrameDraw()
+{
+	memset(bitmap_area, 0x20, VIDEO_RAM_SIZE);
+	ScreenBitmapLineDraw(0, 0, cur_x, cur_y);
+	ScreenBitmapLineDraw(79, 59, cur_x + 5, cur_y + 5);
+	cur_x++;
+	cur_y++;
+	if (cur_x >= 80)
+		cur_x = 0;
+	if (cur_y >= 60)
+		cur_y = 0;
+}
+
 int main()
 {
-	U16 x = 0;
-	U16 y = 0;
 	memset(bitmap_area, 0x20, VIDEO_RAM_SIZE);
 	while (TRUE)
 	{
-		memset(bitmap_area, 0x20, VIDEO_RAM_SIZE);
-		ScreenBitmapDraw(x, y);
+		ScreenBitmapFrameDraw();
 		memcpy(VIDEO_RAM, bitmap_area, VIDEO_RAM_SIZE);
-		x++;
-		if (x >= 80)
-		{
-			x = 0;
-			y++;
-		}
-		if (y >= 60)
-			y = 0;
 	}
 
 	return 0;
