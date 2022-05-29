@@ -10,6 +10,8 @@
 #define BUTTONS_X 5
 #define BUTTONS_Y 7
 
+#define KEY_ENTER 0x0D
+
 const U8 view_area[VIDEO_RAM_SIZE];
 
 U8 last_keycode;
@@ -49,7 +51,7 @@ U0 ButtonDraw(U16 x, U16 y, U8 symbol)
 	}
 	i_x = 0;
 	i_y = 0;
-	if (is_push_draw_pending)
+	if (is_push_draw_pending && last_keycode == symbol)
 	{
 		x++;
 		y++;
@@ -109,6 +111,9 @@ U0 KeyHandle()
 {
 	if (!is_keycode_pending)
 		return;
+
+	if (last_keycode == KEY_ENTER)
+		last_keycode = '='; // override
 
 	is_keycode_pending = FALSE;
 	is_push_draw_pending = TRUE;
