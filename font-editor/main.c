@@ -137,14 +137,19 @@ U0 CurrentCharHexDraw()
 {
 	U8 str[128];
 	U8 i = 0;
+	U8 current_bits;
 	U8 *current = character_ram + current_char;
-	U8 current_bits = *current;
+	
+	current += 7;
+	current_bits = *current;
+
+	ScreenPrint(HEXCODE_X, HEXCODE_Y, "0x");
 
 	while (i < 8)
 	{
 		sprintf(str, "%02X", current_bits);
-		ScreenPrint(HEXCODE_X + i * 3, HEXCODE_Y, str);
-		current++;
+		ScreenPrint(HEXCODE_X + i * 2 + 2, HEXCODE_Y, str);
+		current--;
 		current_bits = *current;
 		i++;
 	}
