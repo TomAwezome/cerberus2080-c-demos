@@ -147,13 +147,6 @@ U0 ScreenBitmapPixelDraw(U16 x, U16 y)
 	}
 }
 
-U16 MaxU16(U16 a, U16 b)
-{
-	if (a > b)
-		return a;
-	else
-		return b;
-}
 U16 MinU16(U16 a, U16 b)
 {
 	if (a < b)
@@ -165,40 +158,114 @@ U16 MinU16(U16 a, U16 b)
 U0 ScreenBitmapLineDraw(U16 x1, U16 y1, U16 x2, U16 y2)
 {
 	U16 x_start = MinU16(x1, x2);
-	U16 x_end = MaxU16(x1, x2);
-	U16 y_start = MinU16(y1, y2);
-	U16 y_end = MaxU16(y1, y2);
-	I16 dx = x_end - x_start;
-	I16 dy = y_end - y_start;
-	I16 p = 2 * dy - dx;
-	U16 x = x_start;
-	U16 y = y_start;
-	
-	while (x < x_end)
+	U16 x_end;
+	U16 y_start;
+	U16 y_end;
+	U16 x;
+	U16 y;
+	U16 dx;
+	U16 dy;
+	U16 c = 0;
+
+	if (x_start == x1)
 	{
-		if (p >= 0)
+		y_start = y1;
+		x_end = x2;
+		y_end = y2;
+	}
+	else // x2
+	{
+		y_start = y2;
+		x_end = x1;
+		y_end = y1;
+	}
+
+	x = x_start;
+	y = y_start;
+	dx = x_end - x_start;
+
+	if (y_end < y_start)
+	{
+		dy = y_start - y_end;
+
+		if (dx >= dy)
 		{
-			ScreenBitmapPixelDraw(x, y);
-			y++;
-			p = p + 2 * dy - 2 * dx;
+			while (x <= x_end)
+			{
+				ScreenBitmapPixelDraw(x, y);
+				c += dy;
+				if (c >= dx)
+				{
+					c -= dx;
+					y--;
+				}
+				x++;
+			}
 		}
 		else
 		{
-			ScreenBitmapPixelDraw(x, y);
-			p = p + 2 * dy;
+			while (y > y_end)
+			{
+				ScreenBitmapPixelDraw(x, y);
+				c += dx;
+				if (c >= dy)
+				{
+					c -= dy;
+					x++;
+				}
+				y--;
+			}
 		}
-		x++;
+	}
+	else
+	{
+		dy = y_end - y_start;
+
+		if (dx >= dy)
+		{
+			while (x <= x_end)
+			{
+				ScreenBitmapPixelDraw(x, y);
+				c += dy;
+				if (c >= dx)
+				{
+					c -= dx;
+					y++;
+				}
+				x++;
+			}
+		}
+		else
+		{
+			while (y <= y_end)
+			{
+				ScreenBitmapPixelDraw(x, y);
+				c += dx;
+				if (c >= dy)
+				{
+					c -= dy;
+					x++;
+				}
+				y++;
+			}
+		}
 	}
 }
 
 U16 cur_x = 10;
-U16 cur_y = 11;
+U16 cur_y = 13;
 
 U0 ScreenBitmapFrameDraw()
 {
 	memset(bitmap_area, 0x20, VIDEO_RAM_SIZE);
 	ScreenBitmapLineDraw(0, 0, cur_x, cur_y);
-	ScreenBitmapLineDraw(79, 59, cur_x + 5, cur_y + 5);
+	ScreenBitmapLineDraw(78, 58, cur_x + 9, cur_y + 9);
+	ScreenBitmapLineDraw(0, 58, cur_x, cur_y + 9);
+	ScreenBitmapLineDraw(78, 0, cur_x + 9, cur_y);
+	ScreenBitmapLineDraw(cur_x, cur_y, cur_x + 9, cur_y);
+	ScreenBitmapLineDraw(cur_x, cur_y, cur_x, cur_y + 9);
+	ScreenBitmapLineDraw(cur_x, cur_y + 9, cur_x + 9, cur_y + 9);
+	ScreenBitmapLineDraw(cur_x + 9, cur_y, cur_x + 9, cur_y + 9);
 	cur_x++;
 	cur_y++;
 	if (cur_x >= 80)
