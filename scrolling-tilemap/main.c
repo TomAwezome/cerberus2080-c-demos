@@ -95,12 +95,10 @@ U0 TilemapDraw()
 	{
 		if (j >= 40)
 		{
-			tile_index += TILEMAP_WIDTH;
-			tile_index -= 40;
+			tile_index += TILEMAP_WIDTH - 40;
 			j = 0;
 		}
-		video_ram[i] = tilemap[tile_index];
-		tile_index++;
+		video_ram[i] = tilemap[tile_index++];
 	}
 }
 
