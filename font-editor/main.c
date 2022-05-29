@@ -154,8 +154,10 @@ U0 CurrentCharIndexDraw()
 {
 	U8 str[128];
 
-	sprintf(str, "Index: %03d", current_char);
+	sprintf(str, "Index: %03d (Decimal)", current_char);
 	ScreenPrint(INDEX_PRINT_X, INDEX_PRINT_Y, str);
+	sprintf(str, "       %02X  (Hex)", current_char);
+	ScreenPrint(INDEX_PRINT_X, INDEX_PRINT_Y + 1, str);
 }
 
 U0 CharacterCursorMoveRight()
