@@ -4,12 +4,19 @@
 
 #include "cerberus.h"
 #include <string.h>
+#include <stdbool.h>
 
 #define BG_CHAR 0x8
 #define BUTTONS_X 5
 #define BUTTONS_Y 7
 
 const U8 view_area[VIDEO_RAM_SIZE];
+
+U8 last_keycode;
+bool is_keycode_pending = FALSE;
+bool is_push_draw_pending = FALSE;
+
+float current_value;
 
 U0 ButtonDraw(U16 x, U16 y, U8 symbol)
 {
@@ -30,6 +37,24 @@ U0 ButtonDraw(U16 x, U16 y, U8 symbol)
 	}
 	i_x = 0;
 	i_y = 0;
+	for (video_y = y; i_y < 3 && video_y < 30; video_y++)
+	{
+		for (video_x = x; i_x < 3 && video_x < 40; video_x++)
+		{
+			view_area[40 * video_y + video_x] = BG_CHAR;
+			i_x++;
+		}
+		i_x = 0;
+		i_y++;
+	}
+	i_x = 0;
+	i_y = 0;
+	if (is_push_draw_pending)
+	{
+		x++;
+		y++;
+		is_push_draw_pending = FALSE;
+	}
 	for (video_y = y; i_y < 3 && video_y < 30; video_y++)
 	{
 		for (video_x = x; i_x < 3 && video_x < 40; video_x++)
@@ -70,11 +95,32 @@ U0 CalculatorDraw()
 
 }
 
+U0 KeyGet()
+{
+	if (*mail_flag != 0)
+	{
+		last_keycode = *mail_box;
+		*mail_flag = 0;
+		is_keycode_pending = TRUE;
+	}
+}
+
+U0 KeyHandle()
+{
+	if (!is_keycode_pending)
+		return;
+
+	is_keycode_pending = FALSE;
+	is_push_draw_pending = TRUE;
+}
+
 int main()
 {
 	memset(view_area, 0x8, VIDEO_RAM_SIZE);
 	while (TRUE)
 	{
+		KeyGet();
+		KeyHandle();
 		CalculatorDraw();
 		memcpy(VIDEO_RAM, view_area, VIDEO_RAM_SIZE);
 	}
