@@ -13,10 +13,10 @@ const U8 view_area[VIDEO_RAM_SIZE];
 
 U0 ButtonDraw(U16 x, U16 y, U8 symbol)
 {
-	U16 video_x;
-	U16 video_y;
-	U16 i_x = 0;
-	U16 i_y = 0;
+	U8 video_x;
+	U8 video_y;
+	U8 i_x = 0;
+	U8 i_y = 0;
 
 	for (video_y = y + 1; i_y < 3 && video_y < 30; video_y++)
 	{
@@ -57,6 +57,16 @@ U0 CalculatorDraw()
 	ButtonDraw(BUTTONS_X, BUTTONS_Y + 10, '1');
 	ButtonDraw(BUTTONS_X + 5, BUTTONS_Y + 10, '2');
 	ButtonDraw(BUTTONS_X + 10, BUTTONS_Y + 10, '3');
+	ButtonDraw(BUTTONS_X + 5, BUTTONS_Y + 15, '0');
+
+	ButtonDraw(BUTTONS_X + 10, BUTTONS_Y + 15, '.');
+	ButtonDraw(BUTTONS_X + 15, BUTTONS_Y + 5, '-');
+	ButtonDraw(BUTTONS_X + 15, BUTTONS_Y + 10, '+');
+	ButtonDraw(BUTTONS_X + 15, BUTTONS_Y + 15, '=');
+	ButtonDraw(BUTTONS_X + 15, BUTTONS_Y, '*');
+	ButtonDraw(BUTTONS_X + 20, BUTTONS_Y, '/');
+	ButtonDraw(BUTTONS_X + 20, BUTTONS_Y + 5, '%');
+	ButtonDraw(BUTTONS_X + 20, BUTTONS_Y + 10, '^');
 
 }
 
