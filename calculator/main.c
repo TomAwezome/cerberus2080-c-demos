@@ -5,6 +5,7 @@
 #include "cerberus.h"
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #define BG_CHAR 0x8
@@ -133,11 +134,55 @@ U0 KeyGet()
 
 U0 KeyHandle()
 {
+	I16 i;
+	I16 c = current_value;
+	I16 d = abs(current_value);
+
 	if (!is_keycode_pending)
 		return;
 
 	if (last_keycode == KEY_ENTER)
 		last_keycode = '='; // override
+
+	if (last_keycode >= '0' && last_keycode <= '9')
+	{
+		current_value = current_value * 10 + last_keycode - '0';
+		if (d > abs(current_value) || (c >= 0 && current_value < 0) || (c < 0 && current_value >= 0))
+			current_value = 0;
+	}
+	
+	switch (last_keycode)
+	{
+		case '=':
+			result_value = current_value;
+			current_value = 0;
+			break;
+		case '+':
+			result_value += current_value;
+			current_value = 0;
+			break;
+		case '-':
+			result_value -= current_value;
+			current_value = 0;
+			break;
+		case '/':
+			result_value /= current_value;
+			current_value = 0;
+			break;
+		case '*':
+			result_value *= current_value;
+			current_value = 0;
+			break;
+		case '^':
+			if (current_value > 0)
+				for (i = 0; i < current_value; i++)
+					result_value *= result_value;
+			else
+				result_value = 0;
+			current_value = 0;
+			break;
+
+	}
 
 	is_keycode_pending = FALSE;
 	is_push_draw_pending = TRUE;
