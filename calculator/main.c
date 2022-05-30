@@ -5,9 +5,10 @@
 #include "cerberus.h"
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define BG_CHAR 0x8
-#define BUTTONS_X 5
+#define BUTTONS_X 8
 #define BUTTONS_Y 7
 
 #define KEY_ENTER 0x0D
@@ -18,9 +19,19 @@ U8 last_keycode;
 bool is_keycode_pending = FALSE;
 bool is_push_draw_pending = FALSE;
 
-float current_value;
+I16 result_value = 0;
+I16 current_value = 0;
 
-U0 ButtonDraw(U16 x, U16 y, U8 symbol)
+U0 ViewPrint(U8 x, U8 y, U8 *str)
+{ // Write bytes of str to view area at position x,y.
+	U16 i;
+	U16 l = strlen(str);
+
+	for (i = 0; i < l; i++)
+		view_area[40 * y + x++] = str[i];
+}
+
+U0 ButtonDraw(U8 x, U8 y, U8 symbol)
 {
 	U8 video_x;
 	U8 video_y;
@@ -71,8 +82,21 @@ U0 ButtonDraw(U16 x, U16 y, U8 symbol)
 	view_area[40 * (y + 1) + x + 1] = symbol;
 }
 
+U0 DigitsLineDraw(U8 x, U8 y)
+{
+	U8 str[128];
+
+	sprintf(str, "%-6d", result_value);
+	ViewPrint(x, y, str);
+
+	sprintf(str, "%-6d", current_value);
+	ViewPrint(x, y + 2, str);
+}
+
 U0 CalculatorDraw()
 {
+	DigitsLineDraw(BUTTONS_X + 9, BUTTONS_Y - 4);
+
 	ButtonDraw(BUTTONS_X, BUTTONS_Y, '7');
 	ButtonDraw(BUTTONS_X + 5, BUTTONS_Y, '8');
 	ButtonDraw(BUTTONS_X + 10, BUTTONS_Y, '9');
