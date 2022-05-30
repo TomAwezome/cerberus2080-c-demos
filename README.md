@@ -2,6 +2,13 @@
 
 Demo programs for the [The Byte Attic's CERBERUS 2080™](https://github.com/TheByteAttic/CERBERUS2080) computer written in C using Z88DK.
 
+![](images/construction.gif)
+
+|![](images/fonteditor.png)|![](images/bitmapengine.gif)|
+|:-:|:-:|
+|![](images/texteditor.gif)|![](images/calculator.png)|
+
+
 ## Setup
 
 Z88DK must be installed to compile the C programs in this repository. [See the Z88DK README for details.](https://github.com/z88dk/z88dk#installation) I use the Snap package local installation approach on a Ubuntu machine.
