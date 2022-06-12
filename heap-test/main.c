@@ -50,6 +50,7 @@ int main()
 	// TEST 1
 	// Program should be able to malloc and free regions from heap without issue as well as read/write verify
 	ScreenPrint(0, 1, "Test 1: malloc, verify R/W, free");
+	is_good = TRUE;
 
 	i = 0;
 	while (i < 30)
