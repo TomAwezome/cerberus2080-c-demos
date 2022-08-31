@@ -19,6 +19,19 @@ U0 ScreenPrint(U16 x, U16 y, U8 *str)
 		video_ram[40 * y + x++] = str[i];
 }
 
+U8 status_line_num = 0;
+
+U0 TestStatusPrint(bool is_good)
+{
+	U8 *str;
+	if (is_good)
+		str = ":)";
+	else
+		str = ":(";
+
+	ScreenPrint(38, status_line_num++, str);
+}
+
 int main()
 {
 	U16 i;
@@ -28,10 +41,11 @@ int main()
 	U8 *str;
 	bool is_good = TRUE;
 	U8 *program_end_estimate = 0x2000;
+	U8 line_num = 0;
+	U8 test_num = 0;
 
-	// TEST 0
-	// Program should be able to verify write/read success through heap space
-	ScreenPrint(0, 0, "Test 0: Heap RAM verify");
+	// TEST: Verify write/read success through heap space
+	ScreenPrint(0, line_num, "Test 0: Heap RAM verify");
 
 	chunk = program_end_estimate + HEAP_SIZE;
 	while (chunk > program_end_estimate)
@@ -42,14 +56,13 @@ int main()
 		chunk--;
 	}
 
-	if (is_good)
-		ScreenPrint(38, 0, ":)");
-	else
-		ScreenPrint(38, 0, ":(");
+	TestStatusPrint(is_good);
 
-	// TEST 1
-	// Program should be able to malloc and free regions from heap without issue as well as read/write verify
-	ScreenPrint(0, 1, "Test 1: malloc, verify R/W, free");
+	line_num++;
+	test_num++;
+	// TEST: malloc and free regions from heap, read/write verify
+	sprintf(str, "Test %d: malloc, verify R/W, free", test_num);
+	ScreenPrint(0, line_num, str);
 	is_good = TRUE;
 
 	i = 0;
@@ -68,14 +81,14 @@ int main()
 		}
 
 		sprintf(str, "%-5d", size);
-		ScreenPrint(0, 2, str);
+		ScreenPrint(0, line_num + 1, str);
 
 		memset(chunk, 217, size);
 		for (j = 0; j < size; j++)
 		{
 			if (chunk[j] != 217)
 			{
-				ScreenPrint(37, 1, "?");
+				ScreenPrint(37, line_num, "?");
 				is_good = FALSE;
 				return 0;
 			}
@@ -85,14 +98,15 @@ int main()
 		i++;
 	}
 
-	if (is_good)
-		ScreenPrint(38, 1, ":)");
-	else
-		ScreenPrint(38, 1, ":(");
+	TestStatusPrint(is_good);
 
-	// TEST 2
-	// Program will see how many consecutive bytes it can malloc from a 32k heap
-	ScreenPrint(0, 2, "Test 2: consecutive of 32k");
+	line_num++;
+	test_num++;
+	// TEST: Determine max consecutive bytes can malloc from a 32k heap
+	sprintf(str, "Test %d: consecutive of 32k", test_num);
+	ScreenPrint(0, line_num, str);
+	is_good = TRUE;
+
 	size = 1;
 	chunk = malloc(size);
 	while (chunk != NULL)
@@ -101,9 +115,9 @@ int main()
 		size++;
 		chunk = malloc(size);
 	}
-	ScreenPrint(38, 2, ":)");
 	sprintf(str, "%d", size - 1);
-	ScreenPrint(32, 2, str);
+	ScreenPrint(32, line_num, str);
+	TestStatusPrint(is_good);
 
 	return 0;
 }
