@@ -45,14 +45,31 @@ int main()
 	U8 test_num = 0;
 
 	// TEST: Verify write/read success through heap space
-	ScreenPrint(0, line_num, "Test 0: Heap RAM verify");
+	ScreenPrint(0, line_num, "Test 0: Heap RAM verify R/W");
 
 	chunk = program_end_estimate + HEAP_SIZE;
 	while (chunk > program_end_estimate)
 	{
-		*chunk = 217;
-		if (*chunk != 217)
+		*chunk = 255;
+		if (*chunk != 255)
 			is_good = FALSE;
+		*chunk = 0;
+		if (*chunk != 0)
+			is_good = FALSE;
+		*chunk = 170;
+		if (*chunk != 170)
+			is_good = FALSE;
+		*chunk = 85;
+		if (*chunk != 85)
+			is_good = FALSE;
+		*chunk = 240;
+		if (*chunk != 240)
+			is_good = FALSE;
+		*chunk = 15;
+		if (*chunk != 15)
+			is_good = FALSE;
+
+		*chunk = 0;
 		chunk--;
 	}
 
