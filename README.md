@@ -13,6 +13,8 @@ Demo programs for the [The Byte Attic's CERBERUS 2080™](https://github.com/The
 
 Z88DK must be installed to compile the C programs in this repository. [See the Z88DK README for details.](https://github.com/z88dk/z88dk#installation) I use the Snap package local installation approach on a Ubuntu machine.
 
+Run `git clone https://TomAwezome/cerberus2080-c-demos && cd cerberus2080-c-demos` to download the demo programs.
+
 ## Compiling
 
 The programs are written targetting the Z80 processor, memory map, and standard BIOS of the CERBERUS 2080™. To compile program source code, the following command can be used:
